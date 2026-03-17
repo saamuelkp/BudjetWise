@@ -13,8 +13,8 @@ def ajouter_transaction():
     
     nouvelle_transaction = Transaction(
         user_id=user_id,
-        montant=data['montant'],
-        categorie=data['categorie'],
+        montant=data.get('amount', data.get('montant')),
+        categorie=data.get('category', data.get('categorie')),
         description=data.get('description', ''),
         date=datetime.now()
     )
@@ -35,7 +35,9 @@ def get_transactions():
     for t in transactions:
         resultat.append({
             'id': t.id,
+            'amount': t.montant,
             'montant': t.montant,
+            'category': t.categorie,
             'categorie': t.categorie,
             'description': t.description,
             'date': t.date.strftime('%Y-%m-%d %H:%M')
@@ -66,10 +68,15 @@ def dashboard():
             alertes.append(f"Attention : tu dépenses beaucoup en {categorie} ({montant}$)")
     
     return jsonify({
+        'salary': user.salaire,
         'salaire': user.salaire,
+        'total_expenses': total_depense,
         'total_depense': total_depense,
+        'remaining_budget': budget_restant,
         'budget_restant': budget_restant,
+        'expenses_by_category': par_categorie,
         'par_categorie': par_categorie,
+        'alerts': alertes,
         'alertes': alertes
     }), 200
 
