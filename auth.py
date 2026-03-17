@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from database import db, User
 import bcrypt
 
@@ -53,4 +53,23 @@ def login():
         'token': token,
         'nom': user.nom,
         'email': user.email
+    }), 200
+
+@auth_bp.route('/salaire', methods=['PUT'])
+@jwt_required()
+def modifier_salaire():
+    user_id = get_jwt_identity()
+    data = request.get_json()
+    
+    user = User.query.get(user_id)
+    
+    if not user:
+        return jsonify({'erreur': 'Utilisateur introuvable'}), 404
+    
+    user.salaire = data['salaire']
+    db.session.commit()
+    
+    return jsonify({
+        'message': 'Salaire mis à jour !',
+        'salaire': user.salaire
     }), 200

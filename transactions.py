@@ -72,3 +72,18 @@ def dashboard():
         'par_categorie': par_categorie,
         'alertes': alertes
     }), 200
+
+@transactions_bp.route('/transactions/<int:id>', methods=['DELETE'])
+@jwt_required()
+def supprimer_transaction(id):
+    user_id = get_jwt_identity()
+    
+    transaction = Transaction.query.filter_by(id=id, user_id=user_id).first()
+    
+    if not transaction:
+        return jsonify({'erreur': 'Transaction introuvable'}), 404
+    
+    db.session.delete(transaction)
+    db.session.commit()
+    
+    return jsonify({'message': 'Dépense supprimée !'}), 200
