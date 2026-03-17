@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BudgetWise - Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="dashboard-body">
+  <header class="topbar">
+    <div>
+      <h1>BudgetWise</h1>
+      <p id="welcomeText">Bienvenue</p>
+    </div>
+
+    <div class="topbar-actions">
+      <button id="refreshBtn" class="secondary-btn">Actualiser</button>
+      <button id="logoutBtn" class="danger-btn">Déconnexion</button>
+    </div>
+  </header>
+
+  <main class="dashboard-container">
+    <section class="summary-grid">
+      <div class="summary-card">
+        <h3>Salaire</h3>
+        <p id="salaryValue">$0.00</p>
+      </div>
+
+      <div class="summary-card">
+        <h3>Total dépenses</h3>
+        <p id="expenseValue">$0.00</p>
+      </div>
+
+      <div class="summary-card highlight">
+        <h3>Budget restant</h3>
+        <p id="remainingValue">$0.00</p>
+      </div>
+    </section>
+
+    <section class="content-grid">
+      <div class="card">
+        <h2>Ajouter une dépense</h2>
+        <div id="transactionMessage" class="message-box"></div>
+
+        <form id="transactionForm">
+          <label for="amount">Montant ($)</label>
+          <input type="number" id="amount" min="0" step="0.01" placeholder="Ex: 45.50" required />
+
+          <label for="category">Catégorie</label>
+          <select id="category" required>
+            <option value="">Choisir une catégorie</option>
+            <option value="Épicerie">Épicerie</option>
+            <option value="Loyer">Loyer</option>
+            <option value="Transport">Transport</option>
+            <option value="Restaurant">Restaurant</option>
+            <option value="Loisirs">Loisirs</option>
+            <option value="Factures">Factures</option>
+            <option value="Santé">Santé</option>
+            <option value="Autre">Autre</option>
+          </select>
+
+          <label for="description">Description</label>
+          <input type="text" id="description" placeholder="Ex: IGA, Uber, McDo..." required />
+
+          <button type="submit" class="primary-btn">Ajouter la dépense</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Alertes</h2>
+        <ul id="alertsList" class="alerts-list">
+          <li>Aucune alerte pour le moment.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="charts-grid">
+      <div class="card">
+        <h2>Dépenses par catégorie</h2>
+        <canvas id="categoryChart"></canvas>
+      </div>
+
+      <div class="card">
+        <h2>Évolution des dépenses</h2>
+        <canvas id="weeklyChart"></canvas>
+      </div>
+    </section>
+
+    <section class="content-grid">
+      <div class="card">
+        <h2>Historique des transactions</h2>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Catégorie</th>
+                <th>Description</th>
+                <th>Montant</th>
+              </tr>
+            </thead>
+            <tbody id="transactionsTableBody">
+              <tr>
+                <td colspan="4">Aucune transaction trouvée.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Conseils IA</h2>
+        <div id="aiTipsBox" class="tips-box">
+          <p>Les conseils personnalisés apparaîtront ici quand assez de données seront disponibles.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="mock-api.js"></script>
+<script src="dashboard.js"></script>
