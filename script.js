@@ -1,0 +1,1 @@
+console.log("BudgetWise Front-End chargé");
