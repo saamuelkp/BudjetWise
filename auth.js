@@ -35,7 +35,7 @@ function switchToRegister() {
 btnShowLogin.addEventListener("click", switchToLogin);
 btnShowRegister.addEventListener("click", switchToRegister);
 
-registerForm.addEventListener("submit", function (e) {
+registerForm.addEventListener("submit", async function (e) {
   e.preventDefault();
 
   const name = document.getElementById("registerName").value.trim();
@@ -43,12 +43,7 @@ registerForm.addEventListener("submit", function (e) {
   const password = document.getElementById("registerPassword").value.trim();
   const salary = parseFloat(document.getElementById("registerSalary").value);
 
-  const result = MockAPI.register({
-    name,
-    email,
-    password,
-    salary
-  });
+  const result = await API.register({ name, email, password, salary });
 
   if (!result.ok) {
     showMessage(result.message, "error");
@@ -60,13 +55,13 @@ registerForm.addEventListener("submit", function (e) {
   switchToLogin();
 });
 
-loginForm.addEventListener("submit", function (e) {
+loginForm.addEventListener("submit", async function (e) {
   e.preventDefault();
 
   const email = document.getElementById("loginEmail").value.trim();
   const password = document.getElementById("loginPassword").value.trim();
 
-  const result = MockAPI.login({ email, password });
+  const result = await API.login({ email, password });
 
   if (!result.ok) {
     showMessage(result.message, "error");
