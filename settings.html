@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BudgetWise - Paramètres</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="dashboard-body">
+  <header class="topbar">
+    <div>
+      <h1>BudgetWise</h1>
+      <p>Changer mot de passe</p>
+    </div>
+    <div class="topbar-actions">
+      <button id="backBtn" class="secondary-btn">← Dashboard</button>
+      <button id="logoutBtn" class="danger-btn">Déconnexion</button>
+    </div>
+  </header>
+
+  <main class="dashboard-container">
+    <section class="content-grid">
+      <div class="card">
+        <h2>Changer le mot de passe</h2>
+        <div id="passwordMessage" class="message-box"></div>
+        <label for="oldPassword">Ancien mot de passe</label>
+        <input type="password" id="oldPassword" placeholder="Ancien mot de passe" />
+        <label for="newPassword">Nouveau mot de passe</label>
+        <input type="password" id="newPassword" placeholder="Minimum 6 caractères" />
+        <label for="confirmNewPassword">Confirmer le mot de passe</label>
+        <input type="password" id="confirmNewPassword" placeholder="Répétez le nouveau mot de passe" />
+        <button id="savePasswordBtn" class="primary-btn" style="margin-top:12px;">Changer le mot de passe</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="api.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>

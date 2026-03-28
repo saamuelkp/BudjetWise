@@ -32,6 +32,10 @@ function formatMoney(value) {
   return `$${Number(value || 0).toFixed(2)}`;
 }
 
+document.getElementById("settingsBtn").addEventListener("click", () => {
+  window.location.href = "settings.html";
+});
+
 logoutBtn.addEventListener("click", () => {
   API.logout();
   window.location.href = "index.html";
