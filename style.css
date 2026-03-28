@@ -304,3 +304,12 @@
       flex-wrap: wrap;
     }
   }
+  .forgot-btn {
+    background: none;
+    border: none;
+    color: #2563eb;
+    cursor: pointer;
+    font-size: 13px;
+    margin-top: 4px;
+    text-decoration: underline;
+  }

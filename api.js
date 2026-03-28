@@ -1,4 +1,4 @@
-const API_URL = "https://budjetwise-production.up.railway.app";// ← mettez l'URL de Samuel
+const API_URL = "https://budjetwise-production.up.railway.app";
 
 const API = {
 
@@ -25,6 +25,17 @@ const API = {
     localStorage.setItem("budgetwise_name", data.name);
     localStorage.setItem("budgetwise_email", data.email);
     return { ok: true, token: data.token, name: data.name };
+  },
+
+  async resetPassword(email, newPassword) {
+    const response = await fetch(`${API_URL}/reset-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password: newPassword })
+    });
+    const data = await response.json();
+    if (!response.ok) return { ok: false, message: data.erreur };
+    return { ok: true, message: data.message };
   },
 
   async updateSalary(salaire) {
@@ -57,18 +68,20 @@ const API = {
     return { ok: true, message: data.message };
   },
 
-  async getUserTransactions() {
+  async getUserTransactions(mois = null) {
     const token = localStorage.getItem("budgetwise_token");
-    const response = await fetch(`${API_URL}/transactions`, {
+    const url = mois ? `${API_URL}/transactions?mois=${mois}` : `${API_URL}/transactions`;
+    const response = await fetch(url, {
       headers: { "Authorization": `Bearer ${token}` }
     });
     if (!response.ok) return [];
     return await response.json();
   },
 
-  async getDashboard() {
+  async getDashboard(mois = null) {
     const token = localStorage.getItem("budgetwise_token");
-    const response = await fetch(`${API_URL}/dashboard`, {
+    const url = mois ? `${API_URL}/dashboard?mois=${mois}` : `${API_URL}/dashboard`;
+    const response = await fetch(url, {
       headers: { "Authorization": `Bearer ${token}` }
     });
     if (!response.ok) return null;
@@ -84,6 +97,24 @@ const API = {
     const data = await response.json();
     if (!response.ok) return { ok: false, message: data.erreur };
     return { ok: true, message: data.message };
+  },
+
+  async getHistorique() {
+    const token = localStorage.getItem("budgetwise_token");
+    const response = await fetch(`${API_URL}/historique`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    if (!response.ok) return { mois_disponibles: [] };
+    return await response.json();
+  },
+
+  async getStatistiques() {
+    const token = localStorage.getItem("budgetwise_token");
+    const response = await fetch(`${API_URL}/statistiques`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    if (!response.ok) return null;
+    return await response.json();
   },
 
   logout() {

@@ -2,9 +2,13 @@ const btnShowLogin = document.getElementById("btnShowLogin");
 const btnShowRegister = document.getElementById("btnShowRegister");
 const loginSection = document.getElementById("loginSection");
 const registerSection = document.getElementById("registerSection");
+const forgotSection = document.getElementById("forgotSection");
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
+const forgotForm = document.getElementById("forgotForm");
 const messageBox = document.getElementById("messageBox");
+const forgotBtn = document.getElementById("forgotBtn");
+const backToLoginBtn = document.getElementById("backToLoginBtn");
 
 function showMessage(message, type = "success") {
   messageBox.textContent = message;
@@ -21,6 +25,7 @@ function switchToLogin() {
   btnShowRegister.classList.remove("active");
   loginSection.classList.remove("hidden");
   registerSection.classList.add("hidden");
+  forgotSection.classList.add("hidden");
   clearMessage();
 }
 
@@ -29,11 +34,53 @@ function switchToRegister() {
   btnShowLogin.classList.remove("active");
   registerSection.classList.remove("hidden");
   loginSection.classList.add("hidden");
+  forgotSection.classList.add("hidden");
   clearMessage();
 }
 
 btnShowLogin.addEventListener("click", switchToLogin);
 btnShowRegister.addEventListener("click", switchToRegister);
+
+forgotBtn.addEventListener("click", () => {
+  loginSection.classList.add("hidden");
+  forgotSection.classList.remove("hidden");
+  clearMessage();
+});
+
+backToLoginBtn.addEventListener("click", () => {
+  forgotSection.classList.add("hidden");
+  loginSection.classList.remove("hidden");
+  clearMessage();
+});
+
+forgotForm.addEventListener("submit", async function (e) {
+  e.preventDefault();
+  const email = document.getElementById("forgotEmail").value.trim();
+  const newPassword = document.getElementById("newPassword").value.trim();
+  const confirmNewPassword = document.getElementById("confirmNewPassword").value.trim();
+
+  if (newPassword !== confirmNewPassword) {
+    showMessage("Les mots de passe ne correspondent pas.", "error");
+    return;
+  }
+
+  if (newPassword.length < 6) {
+    showMessage("Le mot de passe doit contenir au moins 6 caractères.", "error");
+    return;
+  }
+
+  const result = await API.resetPassword(email, newPassword);
+
+  if (!result.ok) {
+    showMessage(result.message, "error");
+    return;
+  }
+
+  showMessage("Mot de passe réinitialisé avec succès !", "success");
+  forgotForm.reset();
+  forgotSection.classList.add("hidden");
+  loginSection.classList.remove("hidden");
+});
 
 registerForm.addEventListener("submit", async function (e) {
   e.preventDefault();
