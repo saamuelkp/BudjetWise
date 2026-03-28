@@ -5,6 +5,15 @@ from datetime import datetime
 
 transactions_bp = Blueprint('transactions', __name__)
 
+def get_transactions_mois_courant(user_id):
+    """Retourne seulement les transactions du mois courant"""
+    maintenant = datetime.now()
+    debut_mois = maintenant.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    return Transaction.query.filter(
+        Transaction.user_id == user_id,
+        Transaction.date >= debut_mois
+    ).all()
+
 @transactions_bp.route('/transactions', methods=['POST'])
 @jwt_required()
 def ajouter_transaction():
@@ -29,7 +38,8 @@ def ajouter_transaction():
 def get_transactions():
     user_id = get_jwt_identity()
     
-    transactions = Transaction.query.filter_by(user_id=user_id).all()
+    # Seulement les transactions du mois courant
+    transactions = get_transactions_mois_courant(user_id)
     
     resultat = []
     for t in transactions:
@@ -51,7 +61,8 @@ def dashboard():
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
     
-    transactions = Transaction.query.filter_by(user_id=user_id).all()
+    # Seulement les transactions du mois courant
+    transactions = get_transactions_mois_courant(user_id)
     
     total_depense = sum(t.montant for t in transactions)
     budget_restant = user.salaire - total_depense
@@ -66,6 +77,10 @@ def dashboard():
     for categorie, montant in par_categorie.items():
         if montant > user.salaire * 0.3:
             alertes.append(f"Attention : tu dépenses beaucoup en {categorie} ({montant}$)")
+
+    # Infos du mois courant pour le frontend
+    maintenant = datetime.now()
+    mois_courant = maintenant.strftime('%B %Y')
     
     return jsonify({
         'salary': user.salaire,
@@ -77,7 +92,8 @@ def dashboard():
         'expenses_by_category': par_categorie,
         'par_categorie': par_categorie,
         'alerts': alertes,
-        'alertes': alertes
+        'alertes': alertes,
+        'mois': mois_courant
     }), 200
 
 @transactions_bp.route('/transactions/<int:id>', methods=['DELETE'])
