@@ -25,16 +25,11 @@
       <form id="loginForm">
         <label for="loginEmail">Email</label>
         <input type="email" id="loginEmail" placeholder="exemple@email.com" required />
-
         <label for="loginPassword">Mot de passe</label>
         <input type="password" id="loginPassword" placeholder="Votre mot de passe" required />
-
         <button type="submit" class="primary-btn">Se connecter</button>
-        <button type="button" id="forgotBtn" class="forgot-btn">Mot de passe oublié ?</button>
       </form>
     </section>
-
-  
 
     <section id="registerSection" class="form-card hidden">
       <h2>Inscription</h2>
@@ -51,8 +46,18 @@
         <label for="registerConfirmPassword">Confirmer le mot de passe</label>
         <input type="password" id="registerConfirmPassword" placeholder="Répétez votre mot de passe" required />
 
-        <label for="registerSalary">Salaire aux 2 semaines ($)</label>
+        <label for="registerSalary">Salaire ($)</label>
         <input type="number" id="registerSalary" placeholder="2000" min="0" step="0.01" required />
+
+        <label for="registerFrequence">Fréquence de paie</label>
+        <select id="registerFrequence" required>
+          <option value="">Choisir une fréquence</option>
+          <option value="semaine">Chaque semaine</option>
+          <option value="2semaines">Chaque 2 semaines</option>
+        </select>
+
+        <label for="registerDatePaie">Date de la prochaine paie</label>
+        <input type="date" id="registerDatePaie" required />
 
         <button type="submit" class="primary-btn">Créer un compte</button>
       </form>
