@@ -49,7 +49,6 @@ def register():
     db.session.add(nouvel_user)
     db.session.commit()
 
-    # Envoi email de confirmation (ne bloque pas si ça échoue)
     envoyer_email_confirmation(data['name'], data['email'])
 
     return jsonify({'message': 'Compte créé avec succès !'}), 201
@@ -93,3 +92,27 @@ def modifier_salaire():
         'message': 'Salaire mis à jour !',
         'salaire': user.salaire
     }), 200
+
+@auth_bp.route('/change-password', methods=['POST'])
+@jwt_required()
+def change_password():
+    """Changer son mot de passe quand on est connecté"""
+    user_id = get_jwt_identity()
+    data = request.get_json()
+
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({'erreur': 'Utilisateur introuvable'}), 404
+
+    if not bcrypt.checkpw(data['old_password'].encode('utf-8'), user.mot_de_passe.encode('utf-8')):
+        return jsonify({'erreur': 'Ancien mot de passe incorrect'}), 401
+
+    user.mot_de_passe = bcrypt.hashpw(
+        data['new_password'].encode('utf-8'),
+        bcrypt.gensalt()
+    ).decode('utf-8')
+
+    db.session.commit()
+
+    return jsonify({'message': 'Mot de passe changé avec succès !'}), 200
