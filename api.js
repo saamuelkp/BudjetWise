@@ -1,4 +1,4 @@
-const API_URL = "http://budgetwise-production.up.railway.app";
+const API_URL = "https://budjetwise-production.up.railway.app";// ← mettez l'URL de Samuel
 
 const API = {
 

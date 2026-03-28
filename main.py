@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager
-CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=False)
+from flask_cors import CORS
 from database import db, User, Transaction, Budget
 from auth import auth_bp
 from transactions import transactions_bp
@@ -13,7 +13,7 @@ app.config['JWT_SECRET_KEY'] = 'budgetwise-jwt-secret'
 
 db.init_app(app)
 jwt = JWTManager(app)
-CORS(app, origins="*", supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=False)
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(transactions_bp)
