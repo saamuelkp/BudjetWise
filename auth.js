@@ -41,7 +41,18 @@ registerForm.addEventListener("submit", async function (e) {
   const name = document.getElementById("registerName").value.trim();
   const email = document.getElementById("registerEmail").value.trim();
   const password = document.getElementById("registerPassword").value.trim();
+  const confirmPassword = document.getElementById("registerConfirmPassword").value.trim();
   const salary = parseFloat(document.getElementById("registerSalary").value);
+
+  if (password !== confirmPassword) {
+    showMessage("Les mots de passe ne correspondent pas.", "error");
+    return;
+  }
+
+  if (password.length < 6) {
+    showMessage("Le mot de passe doit contenir au moins 6 caractères.", "error");
+    return;
+  }
 
   const result = await API.register({ name, email, password, salary });
 
