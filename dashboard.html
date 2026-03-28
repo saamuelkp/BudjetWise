@@ -12,7 +12,6 @@
       <h1>BudgetWise</h1>
       <p id="welcomeText">Bienvenue</p>
     </div>
-
     <div class="topbar-actions">
       <button id="refreshBtn" class="secondary-btn">Actualiser</button>
       <button id="logoutBtn" class="danger-btn">Déconnexion</button>
@@ -21,9 +20,16 @@
 
   <main class="dashboard-container">
     <section class="summary-grid">
+
       <div class="summary-card">
         <h3>Salaire</h3>
         <p id="salaryValue">$0.00</p>
+        <button id="editSalaryBtn" class="secondary-btn" style="margin-top:8px;font-size:13px;">Modifier</button>
+        <div id="salaryForm" style="display:none;margin-top:8px;">
+          <input type="number" id="newSalaryInput" min="0" step="0.01" placeholder="Nouveau salaire"
+            style="width:100%;padding:6px;border-radius:6px;border:1px solid #ccc;" />
+          <button id="saveSalaryBtn" class="primary-btn" style="margin-top:6px;width:100%;font-size:13px;">Sauvegarder</button>
+        </div>
       </div>
 
       <div class="summary-card">
@@ -35,13 +41,13 @@
         <h3>Budget restant</h3>
         <p id="remainingValue">$0.00</p>
       </div>
+
     </section>
 
     <section class="content-grid">
       <div class="card">
         <h2>Ajouter une dépense</h2>
         <div id="transactionMessage" class="message-box"></div>
-
         <form id="transactionForm">
           <label for="amount">Montant ($)</label>
           <input type="number" id="amount" min="0" step="0.01" placeholder="Ex: 45.50" required />
@@ -79,7 +85,6 @@
         <h2>Dépenses par catégorie</h2>
         <canvas id="categoryChart"></canvas>
       </div>
-
       <div class="card">
         <h2>Évolution des dépenses</h2>
         <canvas id="weeklyChart"></canvas>
@@ -97,11 +102,12 @@
                 <th>Catégorie</th>
                 <th>Description</th>
                 <th>Montant</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody id="transactionsTableBody">
               <tr>
-                <td colspan="4">Aucune transaction trouvée.</td>
+                <td colspan="5">Aucune transaction trouvée.</td>
               </tr>
             </tbody>
           </table>
@@ -118,12 +124,7 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="api.js"></script>
   <script src="dashboard.js"></script>
 </body>
 </html>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="mock-api.js"></script>
-<script src="dashboard.js"></script>
-<script src="api.js"></script>
-<script src="dashboard.js"></script>

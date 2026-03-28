@@ -1,8 +1,7 @@
-const API_URL = "https://budjetwise-production.up.railway.app"; // ← remplacer ici
+const API_URL = "https://budgetwise-production.up.railway.app"; // ← mettez l'URL de Samuel
 
 const API = {
 
-  // REGISTER
   async register({ name, email, password, salary }) {
     const response = await fetch(`${API_URL}/register`, {
       method: "POST",
@@ -14,7 +13,6 @@ const API = {
     return { ok: true, message: data.message };
   },
 
-  // LOGIN
   async login({ email, password }) {
     const response = await fetch(`${API_URL}/login`, {
       method: "POST",
@@ -23,15 +21,27 @@ const API = {
     });
     const data = await response.json();
     if (!response.ok) return { ok: false, message: data.erreur };
-
     localStorage.setItem("budgetwise_token", data.token);
     localStorage.setItem("budgetwise_name", data.name);
     localStorage.setItem("budgetwise_email", data.email);
-
     return { ok: true, token: data.token, name: data.name };
   },
 
-  // ADD TRANSACTION
+  async updateSalary(salaire) {
+    const token = localStorage.getItem("budgetwise_token");
+    const response = await fetch(`${API_URL}/salaire`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ salaire })
+    });
+    const data = await response.json();
+    if (!response.ok) return { ok: false, message: data.erreur };
+    return { ok: true, message: data.message };
+  },
+
   async addTransaction({ amount, category, description }) {
     const token = localStorage.getItem("budgetwise_token");
     const response = await fetch(`${API_URL}/transactions`, {
@@ -47,7 +57,6 @@ const API = {
     return { ok: true, message: data.message };
   },
 
-  // GET TRANSACTIONS
   async getUserTransactions() {
     const token = localStorage.getItem("budgetwise_token");
     const response = await fetch(`${API_URL}/transactions`, {
@@ -57,7 +66,6 @@ const API = {
     return await response.json();
   },
 
-  // GET DASHBOARD
   async getDashboard() {
     const token = localStorage.getItem("budgetwise_token");
     const response = await fetch(`${API_URL}/dashboard`, {
@@ -67,7 +75,6 @@ const API = {
     return await response.json();
   },
 
-  // DELETE TRANSACTION
   async deleteTransaction(id) {
     const token = localStorage.getItem("budgetwise_token");
     const response = await fetch(`${API_URL}/transactions/${id}`, {
@@ -79,7 +86,6 @@ const API = {
     return { ok: true, message: data.message };
   },
 
-  // LOGOUT
   logout() {
     localStorage.removeItem("budgetwise_token");
     localStorage.removeItem("budgetwise_name");

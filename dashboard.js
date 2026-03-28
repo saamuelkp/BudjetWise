@@ -14,6 +14,9 @@ const transactionForm = document.getElementById("transactionForm");
 const transactionMessage = document.getElementById("transactionMessage");
 const logoutBtn = document.getElementById("logoutBtn");
 const refreshBtn = document.getElementById("refreshBtn");
+const editSalaryBtn = document.getElementById("editSalaryBtn");
+const salaryForm = document.getElementById("salaryForm");
+const saveSalaryBtn = document.getElementById("saveSalaryBtn");
 
 let categoryChartInstance = null;
 let weeklyChartInstance = null;
@@ -36,41 +39,53 @@ logoutBtn.addEventListener("click", () => {
 
 refreshBtn.addEventListener("click", loadDashboardData);
 
+editSalaryBtn.addEventListener("click", () => {
+  salaryForm.style.display = salaryForm.style.display === "none" ? "block" : "none";
+});
+
+saveSalaryBtn.addEventListener("click", async () => {
+  const newSalary = parseFloat(document.getElementById("newSalaryInput").value);
+  if (!newSalary || newSalary <= 0) return;
+  const result = await API.updateSalary(newSalary);
+  if (result.ok) {
+    salaryForm.style.display = "none";
+    loadDashboardData();
+  }
+});
+
 transactionForm.addEventListener("submit", async function (e) {
   e.preventDefault();
-
   const amount = parseFloat(document.getElementById("amount").value);
   const category = document.getElementById("category").value;
   const description = document.getElementById("description").value.trim();
-
   const result = await API.addTransaction({ amount, category, description });
-
   if (!result.ok) {
     showTransactionMessage(result.message, "error");
     return;
   }
-
   showTransactionMessage(result.message, "success");
   transactionForm.reset();
   loadDashboardData();
 });
 
+async function deleteTransaction(id) {
+  if (!confirm("Supprimer cette dépense ?")) return;
+  const result = await API.deleteTransaction(id);
+  if (result.ok) loadDashboardData();
+}
+
 async function loadDashboardData() {
   const data = await API.getDashboard();
-
   if (!data) {
     alertsList.innerHTML = "<li>Impossible de charger les données.</li>";
     return;
   }
-
   salaryValue.textContent = formatMoney(data.salary);
   expenseValue.textContent = formatMoney(data.total_expenses);
   remainingValue.textContent = formatMoney(data.remaining_budget);
-
   renderAlerts(data.alerts || []);
   renderCategoryChart(data.expenses_by_category || {});
   renderAITips(data);
-
   const transactions = await API.getUserTransactions();
   renderTransactions(transactions);
   renderWeeklyChart(transactions);
@@ -86,7 +101,7 @@ function renderAlerts(alerts) {
 
 function renderTransactions(transactions) {
   if (!transactions.length) {
-    transactionsTableBody.innerHTML = `<tr><td colspan="4">Aucune transaction trouvée.</td></tr>`;
+    transactionsTableBody.innerHTML = `<tr><td colspan="5">Aucune transaction trouvée.</td></tr>`;
     return;
   }
   transactionsTableBody.innerHTML = transactions.map(t => {
@@ -96,6 +111,7 @@ function renderTransactions(transactions) {
       <td>${t.category || "-"}</td>
       <td>${t.description || "-"}</td>
       <td>${formatMoney(t.amount)}</td>
+      <td><button class="danger-btn" style="font-size:12px;padding:4px 10px;" onclick="deleteTransaction(${t.id})">Supprimer</button></td>
     </tr>`;
   }).join("");
 }
