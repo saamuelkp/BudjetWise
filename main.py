@@ -13,7 +13,7 @@ app.config['JWT_SECRET_KEY'] = 'budgetwise-jwt-secret'
 
 db.init_app(app)
 jwt = JWTManager(app)
-CORS(app, origins="*")
+CORS(app, origins="*", supports_credentials=True)
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(transactions_bp)
