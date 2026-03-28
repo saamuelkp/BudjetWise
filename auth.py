@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_mail import Mail, Message
 from database import db, User
+from datetime import datetime
 import bcrypt
 
 auth_bp = Blueprint('auth', __name__)
@@ -39,11 +40,21 @@ def register():
         bcrypt.gensalt()
     ).decode('utf-8')
 
+    # Récupérer la date de première paie
+    date_premiere_paie = None
+    if data.get('date_premiere_paie'):
+        try:
+            date_premiere_paie = datetime.strptime(data['date_premiere_paie'], '%Y-%m-%d')
+        except ValueError:
+            return jsonify({'erreur': 'Format de date invalide. Utilise YYYY-MM-DD'}), 400
+
     nouvel_user = User(
         nom=data['name'],
         email=data['email'],
         mot_de_passe=mot_de_passe_hash,
-        salaire=data.get('salary', 0)
+        salaire=data.get('salary', 0),
+        frequence_paie=data.get('frequence_paie', '2semaines'),
+        date_premiere_paie=date_premiere_paie
     )
 
     db.session.add(nouvel_user)
@@ -71,7 +82,9 @@ def login():
         'token': token,
         'name': user.nom,
         'nom': user.nom,
-        'email': user.email
+        'email': user.email,
+        'frequence_paie': user.frequence_paie,
+        'date_premiere_paie': user.date_premiere_paie.strftime('%Y-%m-%d') if user.date_premiere_paie else None
     }), 200
 
 @auth_bp.route('/salaire', methods=['PUT'])
@@ -96,7 +109,6 @@ def modifier_salaire():
 @auth_bp.route('/change-password', methods=['POST'])
 @jwt_required()
 def change_password():
-    """Changer son mot de passe quand on est connecté"""
     user_id = get_jwt_identity()
     data = request.get_json()
 

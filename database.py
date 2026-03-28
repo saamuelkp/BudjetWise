@@ -8,6 +8,8 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     mot_de_passe = db.Column(db.String(200), nullable=False)
     salaire = db.Column(db.Float, default=0)
+    frequence_paie = db.Column(db.String(20), default='2semaines')  # 'semaine' ou '2semaines'
+    date_premiere_paie = db.Column(db.DateTime, nullable=True)
     transactions = db.relationship('Transaction', backref='user', lazy=True)
 
 class Transaction(db.Model):

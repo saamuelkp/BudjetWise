@@ -1,30 +1,57 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from database import db, Transaction, User
-from datetime import datetime
+from datetime import datetime, timedelta
 
 transactions_bp = Blueprint('transactions', __name__)
 
-def get_transactions_filtre(user_id, mois=None):
-    """Retourne les transactions d'un mois donné (YYYY-MM) ou du mois courant"""
+def get_debut_periode_courante(user):
+    """Calcule le début de la période de paie courante"""
+    if not user.date_premiere_paie:
+        # Pas de date de paie configurée — fallback sur le mois courant
+        maintenant = datetime.now()
+        return maintenant.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    frequence_jours = 7 if user.frequence_paie == 'semaine' else 14
+    maintenant = datetime.now()
+    premiere_paie = user.date_premiere_paie
+
+    # Calculer combien de périodes se sont écoulées depuis la première paie
+    jours_ecoules = (maintenant - premiere_paie).days
+    periodes_ecoulees = jours_ecoules // frequence_jours
+
+    # Début de la période courante
+    debut_periode = premiere_paie + timedelta(days=periodes_ecoulees * frequence_jours)
+
+    return debut_periode.replace(hour=0, minute=0, second=0, microsecond=0)
+
+def get_fin_periode_courante(user):
+    """Calcule la fin de la période de paie courante"""
+    frequence_jours = 7 if user.frequence_paie == 'semaine' else 14
+    debut = get_debut_periode_courante(user)
+    return debut + timedelta(days=frequence_jours)
+
+def get_transactions_periode(user_id, mois=None):
+    """Retourne les transactions de la période courante ou d'un mois spécifique"""
+    user = User.query.get(user_id)
+
     if mois:
         try:
-            debut_mois = datetime.strptime(mois, '%Y-%m')
+            debut = datetime.strptime(mois, '%Y-%m')
+            if debut.month == 12:
+                fin = debut.replace(year=debut.year + 1, month=1)
+            else:
+                fin = debut.replace(month=debut.month + 1)
         except ValueError:
             return None
     else:
-        maintenant = datetime.now()
-        debut_mois = maintenant.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-
-    if debut_mois.month == 12:
-        fin_mois = debut_mois.replace(year=debut_mois.year + 1, month=1)
-    else:
-        fin_mois = debut_mois.replace(month=debut_mois.month + 1)
+        debut = get_debut_periode_courante(user)
+        fin = get_fin_periode_courante(user)
 
     return Transaction.query.filter(
         Transaction.user_id == user_id,
-        Transaction.date >= debut_mois,
-        Transaction.date < fin_mois
+        Transaction.date >= debut,
+        Transaction.date < fin
     ).all()
 
 @transactions_bp.route('/transactions', methods=['POST'])
@@ -50,9 +77,9 @@ def ajouter_transaction():
 @jwt_required()
 def get_transactions():
     user_id = get_jwt_identity()
-    mois = request.args.get('mois')  # ex: ?mois=2026-02
+    mois = request.args.get('mois')
 
-    transactions = get_transactions_filtre(user_id, mois)
+    transactions = get_transactions_periode(user_id, mois)
 
     if transactions is None:
         return jsonify({'erreur': 'Format de mois invalide. Utilise YYYY-MM'}), 400
@@ -76,7 +103,6 @@ def get_transactions():
 def get_historique():
     """Retourne la liste des mois qui ont des transactions"""
     user_id = get_jwt_identity()
-
     transactions = Transaction.query.filter_by(user_id=user_id).all()
 
     mois_set = set()
@@ -84,7 +110,6 @@ def get_historique():
         mois_set.add(t.date.strftime('%Y-%m'))
 
     mois_tries = sorted(mois_set, reverse=True)
-
     return jsonify({'mois_disponibles': mois_tries}), 200
 
 @transactions_bp.route('/dashboard', methods=['GET'])
@@ -94,7 +119,7 @@ def dashboard():
     user = User.query.get(user_id)
     mois = request.args.get('mois')
 
-    transactions = get_transactions_filtre(user_id, mois)
+    transactions = get_transactions_periode(user_id, mois)
 
     if transactions is None:
         return jsonify({'erreur': 'Format de mois invalide. Utilise YYYY-MM'}), 400
@@ -113,8 +138,9 @@ def dashboard():
         if montant > user.salaire * 0.3:
             alertes.append(f"Attention : tu dépenses beaucoup en {categorie} ({montant}$)")
 
-    maintenant = datetime.now()
-    mois_courant = maintenant.strftime('%B %Y')
+    # Infos de la période courante
+    debut_periode = get_debut_periode_courante(user)
+    fin_periode = get_fin_periode_courante(user)
 
     return jsonify({
         'salary': user.salaire,
@@ -127,7 +153,11 @@ def dashboard():
         'par_categorie': par_categorie,
         'alerts': alertes,
         'alertes': alertes,
-        'mois': mois_courant
+        'periode': {
+            'debut': debut_periode.strftime('%Y-%m-%d'),
+            'fin': fin_periode.strftime('%Y-%m-%d'),
+            'frequence': user.frequence_paie
+        }
     }), 200
 
 @transactions_bp.route('/transactions/<int:id>', methods=['DELETE'])
