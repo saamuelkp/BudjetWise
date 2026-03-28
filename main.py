@@ -13,7 +13,7 @@ app.config['JWT_SECRET_KEY'] = 'budgetwise-jwt-secret'
 
 db.init_app(app)
 jwt = JWTManager(app)
-CORS(app)
+CORS(app, origins="*")
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(transactions_bp)
@@ -21,7 +21,7 @@ app.register_blueprint(analytics_bp)
 
 @app.route('/')
 def home():
-    return {'message': 'BudgetWise API fonctionne !'}
+    return {'message': 'BudgetWise API v2 fonctionne !'}
 
 with app.app_context():
     db.create_all()
