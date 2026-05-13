@@ -9,11 +9,14 @@ from transactions import transactions_bp
 from analytics import analytics_bp
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///budgetwise.db'
+
+# PostgreSQL sur Railway, SQLite en fallback local
+database_url = os.environ.get('DATABASE_URL', 'sqlite:///budgetwise.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url.replace('postgres://', 'postgresql://')
 app.config['SECRET_KEY'] = 'budgetwise-secret-key'
 app.config['JWT_SECRET_KEY'] = 'budgetwise-jwt-secret'
 
-# Configuration email via variables d'environnement Railway
+# Configuration email
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -39,4 +42,5 @@ with app.app_context():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
     
