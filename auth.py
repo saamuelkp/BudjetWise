@@ -26,7 +26,8 @@ L'équipe BudgetWise
 """
         mail.send(msg)
     except Exception as e:
-        print(f"Erreur envoi email: {e}")
+        print(f"Erreur envoi email (ignorée): {e}")
+        pass  # Ne jamais bloquer l'inscription à cause de l'email
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
@@ -40,7 +41,6 @@ def register():
         bcrypt.gensalt()
     ).decode('utf-8')
 
-    # Récupérer la date de première paie
     date_premiere_paie = None
     if data.get('date_premiere_paie'):
         try:
