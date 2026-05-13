@@ -2,11 +2,11 @@ const API_URL = "https://budjetwise-production.up.railway.app";
 
 const API = {
 
-  async register({ name, email, password, salary }) {
+  async register({ name, email, password, salary, frequence_paie, date_premiere_paie }) {
     const response = await fetch(`${API_URL}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password, salary })
+      body: JSON.stringify({ name, email, password, salary, frequence_paie, date_premiere_paie })
     });
     const data = await response.json();
     if (!response.ok) return { ok: false, message: data.erreur };
@@ -117,6 +117,21 @@ const API = {
     return await response.json();
   },
 
+  async changePassword(oldPassword, newPassword) {
+    const token = localStorage.getItem("budgetwise_token");
+    const response = await fetch(`${API_URL}/change-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ old_password: oldPassword, new_password: newPassword })
+    });
+    const data = await response.json();
+    if (!response.ok) return { ok: false, message: data.erreur };
+    return { ok: true, message: data.message };
+  },
+
   logout() {
     localStorage.removeItem("budgetwise_token");
     localStorage.removeItem("budgetwise_name");
@@ -124,3 +139,4 @@ const API = {
   }
 
 };
+
