@@ -19,10 +19,11 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_TIMEOUT'] = 10
 
 db.init_app(app)
 jwt = JWTManager(app)
-CORS(app, origins="*", supports_credentials=True)
+CORS(app, origins="*")
 mail = Mail(app)
 
 app.register_blueprint(auth_bp)
@@ -35,5 +36,7 @@ def home():
 
 with app.app_context():
     db.create_all()
+
 if __name__ == '__main__':
     app.run(debug=True)
+    
